@@ -44,3 +44,6 @@
 -keepclassmembers class * extends org.greenrobot.eventbus.util.ThrowableFailureEvent {
   <init>(java.lang.Throwable);
 }
+
+-keep class org.litepal.** {*;}
+-keep class * extends org.litepal.crud.LitePalSupport {*;}
