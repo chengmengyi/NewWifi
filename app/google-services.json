@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "258710704459",
+    "project_id": "netguard-wifi-analyzer",
+    "storage_bucket": "netguard-wifi-analyzer.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:258710704459:android:b1298bc4b0a57a4d9518ce",
+        "android_client_info": {
+          "package_name": "com.netguard.wifi.analyzer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "258710704459-bmbaqtg6ellemljam6a0g0ari6q651p8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCY2zTXwoAsiobLB3uGR9JawFziTSc44BQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "258710704459-bmbaqtg6ellemljam6a0g0ari6q651p8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:258710704459:android:9b376e11cec523df9518ce",
+        "android_client_info": {
+          "package_name": "com.netguard.wifianalyzer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "258710704459-bmbaqtg6ellemljam6a0g0ari6q651p8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCY2zTXwoAsiobLB3uGR9JawFziTSc44BQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "258710704459-bmbaqtg6ellemljam6a0g0ari6q651p8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
