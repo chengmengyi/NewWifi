@@ -69,5 +69,10 @@
                android:textColor="@color/white"
                android:background="@drawable/connect_wifi_sure"/>
        </androidx.appcompat.widget.LinearLayoutCompat>
+       <include
+           android:layout_width="match_parent"
+           android:layout_height="132dp"
+           android:layout_marginTop="16dp"
+           layout="@layout/native_home_ad"/>
    </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.appcompat.widget.LinearLayoutCompat>

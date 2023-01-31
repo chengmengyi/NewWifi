@@ -10,6 +10,7 @@
         <entry key="app/src/main/res/drawable/bg_ffffff_24dp.xml" value="0.2601851851851852" />
         <entry key="app/src/main/res/drawable/bg_ffffff_8dp.xml" value="0.2601851851851852" />
         <entry key="app/src/main/res/drawable/bg_history_top.xml" value="0.2601851851851852" />
+        <entry key="app/src/main/res/drawable/bg_install_btn.xml" value="0.29384615384615387" />
         <entry key="app/src/main/res/drawable/connect_wifi_cancel.xml" value="0.2601851851851852" />
         <entry key="app/src/main/res/drawable/connect_wifi_sure.xml" value="0.2601851851851852" />
         <entry key="app/src/main/res/drawable/launch_progress.xml" value="0.2601851851851852" />
@@ -24,7 +25,7 @@
         <entry key="app/src/main/res/layout/activity_security.xml" value="0.1503623188405797" />
         <entry key="app/src/main/res/layout/activity_security_result.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_web.xml" value="0.1503623188405797" />
-        <entry key="app/src/main/res/layout/dialog_connect_wifi.xml" value="0.1503623188405797" />
+        <entry key="app/src/main/res/layout/dialog_connect_wifi.xml" value="0.25" />
         <entry key="app/src/main/res/layout/dialog_location_permission.xml" value="0.1503623188405797" />
         <entry key="app/src/main/res/layout/item_history.xml" value="0.25" />
         <entry key="app/src/main/res/layout/item_wifi.xml" value="0.1503623188405797" />
@@ -34,6 +35,8 @@
         <entry key="app/src/main/res/layout/layout_home_func.xml" value="0.1503623188405797" />
         <entry key="app/src/main/res/layout/layout_home_top_wifi_info.xml" value="0.1503623188405797" />
         <entry key="app/src/main/res/layout/layout_wifi_list.xml" value="0.1503623188405797" />
+        <entry key="app/src/main/res/layout/native_ad.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/native_home_ad.xml" value="0.335" />
       </map>
     </option>
   </component>

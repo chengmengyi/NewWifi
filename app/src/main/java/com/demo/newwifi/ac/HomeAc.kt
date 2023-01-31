@@ -1,6 +1,5 @@
 package com.demo.newwifi.ac
 
-import android.Manifest
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -9,14 +8,16 @@ import android.net.Uri
 import android.net.wifi.WifiManager
 import android.provider.Settings
 import android.view.Gravity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.demo.newwifi.R
 import com.demo.newwifi.ac.network_test.HistoryAc
 import com.demo.newwifi.ac.network_test.NetTestAc
 import com.demo.newwifi.ac.security.SecurityAc
 import com.demo.newwifi.adapter.WifiListAdapter
+import com.demo.newwifi.admob.AdLimitManager
+import com.demo.newwifi.admob.LoadAdManager
+import com.demo.newwifi.admob.ShowFullAd
+import com.demo.newwifi.admob.ShowNativeAd
 import com.demo.newwifi.base.BaseAc
 import com.demo.newwifi.bean.WifiInfoBean
 import com.demo.newwifi.conf.LocalConf
@@ -42,7 +43,10 @@ import org.greenrobot.eventbus.Subscribe
 import java.lang.Exception
 
 class HomeAc:BaseAc(R.layout.activity_home), OnRefreshListener {
+    private var clickTime=0L
     private var wifiReceiver:WifiReceiver?=null
+    private val showHomeAd by lazy { ShowNativeAd(LocalConf.HOME) }
+    private val showFullAd by lazy { ShowFullAd(LocalConf.CONNECT_WIFI) }
 
     private val wifiAdapter by lazy { WifiListAdapter(this){ clickWifiItem(it) } }
 
@@ -89,21 +93,19 @@ class HomeAc:BaseAc(R.layout.activity_home), OnRefreshListener {
             startActivity(Intent(this,HistoryAc::class.java))
         }
         llc_security.setOnClickListener {
-            if(!drawer_layout.isOpen){
-                if(!drawer_layout.isOpen){
-                    requestLocationPermission {
-                        if (it){
-                            getConnectedWifiInfo()
-                            scanWifiList()
-                            startActivity(Intent(this,SecurityAc::class.java))
-                        }
+            if(!drawer_layout.isOpen&&canClick()){
+                requestLocationPermission {
+                    if (it){
+                        getConnectedWifiInfo()
+                        scanWifiList()
+                        startActivity(Intent(this,SecurityAc::class.java))
                     }
                 }
             }
         }
         llc_network.setOnClickListener {
-            if(!drawer_layout.isOpen){
-                if(WifiUtils.getInstance(this)?.isWifiEnable == true){
+            if(!drawer_layout.isOpen&&canClick()){
+                if(WifiUtils.getInstance(this)?.isWifiEnable == true&&getNetStatus()!=1){
                     requestLocationPermission {
                         if (it){
                             getConnectedWifiInfo()
@@ -112,7 +114,7 @@ class HomeAc:BaseAc(R.layout.activity_home), OnRefreshListener {
                         }
                     }
                 }else{
-                    showToast("Please open wifi")
+                    showToast("Please open the network")
                 }
             }
         }
@@ -151,6 +153,15 @@ class HomeAc:BaseAc(R.layout.activity_home), OnRefreshListener {
         }
     }
 
+    private fun canClick():Boolean{
+        val currentTimeMillis = System.currentTimeMillis()
+        if(currentTimeMillis-clickTime>500){
+            clickTime=currentTimeMillis
+            return true
+        }
+        return false
+    }
+
     private fun setAdapter(){
         rv_wifi_list.apply {
             layoutManager=LinearLayoutManager(this@HomeAc)
@@ -162,13 +173,22 @@ class HomeAc:BaseAc(R.layout.activity_home), OnRefreshListener {
         if(drawer_layout.isOpen) return
         if (wifiInfoBean.hasPwd){
             ConnectWifiDialog(wifiInfoBean){
-                connectedWifiName=wifiInfoBean.name
-                WifiUtils.getInstance(this)?.openWifi()
-                WifiUtils.getInstance(this)?.connectWifiPws(wifiInfoBean.name,it)
-                MMKV.defaultMMKV().encode(wifiInfoBean.name,it)
+                showFullAd.show(
+                    this,
+                    adEmptyBack = true,
+                    showed = {},
+                    closeAd = {
+                        LoadAdManager.load(LocalConf.CONNECT_WIFI)
+                        connectedWifiName=wifiInfoBean.name
+                        WifiUtils.getInstance(this)?.openWifi()
+                        WifiUtils.getInstance(this)?.connectWifiPws(wifiInfoBean.name,it)
+                        MMKV.defaultMMKV().encode(wifiInfoBean.name,it)
+                    }
+                )
             }.show(supportFragmentManager,"ConnectWifiDialog")
         }else{
             if(!hasOverlayPermission(this)){
+                ActivityCallback.banReload=true
                 val intent= Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${this.packageName}"))
                 startActivityForResult(intent, 101)
                 return
@@ -276,6 +296,7 @@ class HomeAc:BaseAc(R.layout.activity_home), OnRefreshListener {
             layout_wifi_connected.showView(true)
             val name = instance?.getConnectedWifiName()?:""
             tv_top_wifi_name.text=name
+            iv_wifi_connected.showView(true)
             tv_connected_wifi_name.text=name
             connectedWifiName=name
             iv_connected_wifi_pwd.setImageResource(if (checkWifiHasPwd(name)) R.drawable.suo else R.drawable.suo2)
@@ -287,6 +308,7 @@ class HomeAc:BaseAc(R.layout.activity_home), OnRefreshListener {
     private fun hideConnectedWifi(){
         layout_wifi_connected.showView(false)
         tv_top_wifi_name.text=""
+        iv_wifi_connected.showView(false)
     }
 
     override fun onRefresh(refreshLayout: RefreshLayout) {
@@ -308,8 +330,18 @@ class HomeAc:BaseAc(R.layout.activity_home), OnRefreshListener {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        ActivityCallback.banReload=false
+        if (AdLimitManager.refresh(LocalConf.HOME)){
+            showHomeAd.showAc(this)
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        showHomeAd.stopShow()
+        AdLimitManager.setValue(LocalConf.HOME,true)
         stopReceiver()
     }
 

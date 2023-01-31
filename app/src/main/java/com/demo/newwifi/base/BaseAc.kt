@@ -7,6 +7,7 @@ import com.gyf.immersionbar.ImmersionBar
 import org.greenrobot.eventbus.EventBus
 
 abstract class BaseAc (private val layout:Int):AppCompatActivity(){
+    var resume=false
     lateinit var immersionBar: ImmersionBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,6 +29,22 @@ abstract class BaseAc (private val layout:Int):AppCompatActivity(){
     abstract fun initView()
 
     open fun initEvent()=false
+
+
+    override fun onResume() {
+        super.onResume()
+        resume=true
+    }
+
+    override fun onPause() {
+        super.onPause()
+        resume=false
+    }
+
+    override fun onStop() {
+        super.onStop()
+        resume=false
+    }
 
     private fun displayMetrics(){
         val metrics: DisplayMetrics = resources.displayMetrics

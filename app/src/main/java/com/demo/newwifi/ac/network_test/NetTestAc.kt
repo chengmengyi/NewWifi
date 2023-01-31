@@ -4,7 +4,12 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Intent
 import com.demo.newwifi.R
+import com.demo.newwifi.ac.security.SecurityResultAc
+import com.demo.newwifi.admob.LoadAdManager
+import com.demo.newwifi.admob.ShowFullAd
 import com.demo.newwifi.base.BaseAc
+import com.demo.newwifi.conf.LocalConf
+import com.demo.newwifi.uti.ActivityCallback
 import com.demo.newwifi.uti.getDelay
 import fr.bmartel.speedtest.SpeedTestReport
 import fr.bmartel.speedtest.SpeedTestSocket
@@ -19,11 +24,12 @@ class NetTestAc:BaseAc(R.layout.activity_net_test) {
     private val speedTestSocket = SpeedTestSocket()
     private var scanTimeJob:Job?=null
     private var downloadJob:Job?=null
+    private val showFullAd by lazy { ShowFullAd(LocalConf.TEST_INTER) }
+
 
     override fun initView() {
         immersionBar.statusBarView(top).init()
         iv_back.setOnClickListener { finish() }
-
         startAnimator()
         startNetTest()
     }
@@ -65,14 +71,24 @@ class NetTestAc:BaseAc(R.layout.activity_net_test) {
     }
 
     private fun toResultAc(speed:Long,googleDelay:Int,twitterDelay:Int,facebookDelay:Int){
-        val apply = Intent(this, NetTestResultAc::class.java).apply {
-            putExtra("speed", speed)
-            putExtra("googleDelay", getSpeed(googleDelay))
-            putExtra("twitterDelay", getSpeed(twitterDelay))
-            putExtra("facebookDelay", getSpeed(facebookDelay))
+        runOnUiThread {
+            showFullAd.show(
+                this,
+                adEmptyBack = true,
+                showed = { stopAll() },
+                closeAd = {
+                    LoadAdManager.load(LocalConf.TEST_INTER)
+                    val apply = Intent(this, NetTestResultAc::class.java).apply {
+                        putExtra("speed", speed)
+                        putExtra("googleDelay", getSpeed(googleDelay))
+                        putExtra("twitterDelay", getSpeed(twitterDelay))
+                        putExtra("facebookDelay", getSpeed(facebookDelay))
+                    }
+                    startActivity(apply)
+                    finish()
+                }
+            )
         }
-        startActivity(apply)
-        finish()
     }
 
     private fun getSpeed(speed:Int):Int{
@@ -99,6 +115,10 @@ class NetTestAc:BaseAc(R.layout.activity_net_test) {
 
     override fun onDestroy() {
         super.onDestroy()
+        stopAll()
+    }
+
+    private fun stopAll(){
         stopAnimator()
         speedTestSocket.clearListeners()
         speedTestSocket.closeSocket()

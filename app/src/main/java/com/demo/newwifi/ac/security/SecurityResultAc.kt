@@ -2,11 +2,16 @@ package com.demo.newwifi.ac.security
 
 import android.net.wifi.WifiManager
 import com.demo.newwifi.R
+import com.demo.newwifi.admob.AdLimitManager
+import com.demo.newwifi.admob.ShowNativeAd
 import com.demo.newwifi.base.BaseAc
+import com.demo.newwifi.conf.LocalConf
 import com.demo.newwifi.uti.WifiUtils
 import kotlinx.android.synthetic.main.activity_security_result.*
 
 class SecurityResultAc:BaseAc(R.layout.activity_security_result) {
+    private val showAd by lazy { ShowNativeAd(LocalConf.TEST_RESULT) }
+
     override fun initView() {
         immersionBar.statusBarView(top).init()
         iv_back.setOnClickListener { finish() }
@@ -47,5 +52,18 @@ class SecurityResultAc:BaseAc(R.layout.activity_security_result) {
             return true
         }
         return true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (AdLimitManager.refresh(LocalConf.TEST_RESULT)){
+            showAd.showAc(this)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        showAd.stopShow()
+        AdLimitManager.setValue(LocalConf.TEST_RESULT,true)
     }
 }

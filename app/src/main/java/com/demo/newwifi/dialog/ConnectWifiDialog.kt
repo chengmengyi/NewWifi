@@ -6,8 +6,12 @@ import android.provider.Settings
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import com.demo.newwifi.R
+import com.demo.newwifi.admob.AdLimitManager
+import com.demo.newwifi.admob.ShowNativeAd
 import com.demo.newwifi.base.BaseDialog
 import com.demo.newwifi.bean.WifiInfoBean
+import com.demo.newwifi.conf.LocalConf
+import com.demo.newwifi.uti.ActivityCallback
 import com.demo.newwifi.uti.hasOverlayPermission
 import com.tencent.mmkv.MMKV
 import kotlinx.android.synthetic.main.dialog_connect_wifi.*
@@ -16,6 +20,9 @@ class ConnectWifiDialog(
     private val wifiInfoBean: WifiInfoBean,
     private val connect:(pwd:String)->Unit
 ):BaseDialog(R.layout.dialog_connect_wifi) {
+
+    private val showNativeAd by lazy { ShowNativeAd(LocalConf.CONNECT_WIFI_DIALOG) }
+
     override fun initView() {
         tv_wifi_name.text=wifiInfoBean.name
         et_pwd.setText(MMKV.defaultMMKV().decodeString(wifiInfoBean.name)?:"")
@@ -37,6 +44,7 @@ class ConnectWifiDialog(
 
     private fun connectWifi(){
         if(!hasOverlayPermission(requireContext())){
+            ActivityCallback.banReload=true
             val intent= Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${requireContext().packageName}"))
             startActivityForResult(intent, 101)
             return
@@ -48,5 +56,20 @@ class ConnectWifiDialog(
         }
         dismiss()
         connect.invoke(trim)
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        ActivityCallback.banReload=false
+        if (AdLimitManager.refresh(LocalConf.CONNECT_WIFI_DIALOG)){
+            showNativeAd.showDialog(this,viewDialog)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        showNativeAd.stopShow()
+        AdLimitManager.setValue(LocalConf.CONNECT_WIFI_DIALOG,true)
     }
 }

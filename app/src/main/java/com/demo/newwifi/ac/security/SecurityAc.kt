@@ -4,7 +4,11 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Intent
 import com.demo.newwifi.R
+import com.demo.newwifi.admob.LoadAdManager
+import com.demo.newwifi.admob.ShowFullAd
 import com.demo.newwifi.base.BaseAc
+import com.demo.newwifi.conf.LocalConf
+import com.demo.newwifi.uti.ActivityCallback
 import com.demo.newwifi.uti.InstallTimeManager
 import com.demo.newwifi.uti.WifiUtils
 import fr.bmartel.speedtest.SpeedTestReport
@@ -20,6 +24,8 @@ class SecurityAc:BaseAc(R.layout.activity_security) {
     private var downloadJob:Job?=null
     private val speedTestSocket = SpeedTestSocket()
     private var objectAnimator:ObjectAnimator?=null
+
+    private val showFullAd by lazy { ShowFullAd(LocalConf.TEST_INTER) }
 
     override fun initView() {
         immersionBar.statusBarView(top).init()
@@ -77,15 +83,25 @@ class SecurityAc:BaseAc(R.layout.activity_security) {
     }
 
     private fun toSecurityResult(transferRateOctet:Long,currentWifiName:String,wifiIp:String,maxSpeed:String,wifiMac:String){
-        val intent = Intent(this, SecurityResultAc::class.java).apply {
-            putExtra("speed",transferRateOctet)
-            putExtra("wifiName",currentWifiName)
-            putExtra("wifiIp",wifiIp)
-            putExtra("maxSpeed",maxSpeed)
-            putExtra("wifiMac",wifiMac)
+        runOnUiThread {
+            showFullAd.show(
+                this,
+                adEmptyBack = true,
+                showed = { stopAll() },
+                closeAd = {
+                    LoadAdManager.load(LocalConf.TEST_INTER)
+                    val intent = Intent(this, SecurityResultAc::class.java).apply {
+                        putExtra("speed",transferRateOctet)
+                        putExtra("wifiName",currentWifiName)
+                        putExtra("wifiIp",wifiIp)
+                        putExtra("maxSpeed",maxSpeed)
+                        putExtra("wifiMac",wifiMac)
+                    }
+                    startActivity(intent)
+                    finish()
+                }
+            )
         }
-        startActivity(intent)
-        finish()
     }
 
     private fun startAnimator(){
@@ -105,6 +121,10 @@ class SecurityAc:BaseAc(R.layout.activity_security) {
 
     override fun onDestroy() {
         super.onDestroy()
+        stopAll()
+    }
+
+    private fun stopAll(){
         stopAnimator()
         speedTestSocket.clearListeners()
         speedTestSocket.closeSocket()

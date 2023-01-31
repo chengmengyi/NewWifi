@@ -7,7 +7,11 @@ import android.view.animation.LinearInterpolator
 import androidx.core.animation.doOnEnd
 import com.blankj.utilcode.util.ActivityUtils
 import com.demo.newwifi.R
+import com.demo.newwifi.admob.AdLimitManager
+import com.demo.newwifi.admob.LoadAdManager
+import com.demo.newwifi.admob.ShowFullAd
 import com.demo.newwifi.base.BaseAc
+import com.demo.newwifi.conf.LocalConf
 import com.demo.newwifi.dialog.LocationPermissionDialog
 import com.demo.newwifi.uti.InstallTimeManager
 import com.demo.newwifi.uti.hasLocationPermission
@@ -15,21 +19,38 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseAc(R.layout.activity_main) {
     private var launchAnimator: ValueAnimator?=null
+    private val showOpenAd by lazy { ShowFullAd(LocalConf.OPEN) }
 
     override fun initView() {
+        AdLimitManager.resetValue()
+        LoadAdManager.preLoadAllAd()
         InstallTimeManager.writeTime()
         startAnimator()
     }
 
     private fun startAnimator(){
         launchAnimator=ValueAnimator.ofInt(0, 100).apply {
-            duration = 3000L
+            duration = 10000L
             interpolator = LinearInterpolator()
             addUpdateListener {
                 val progress = it.animatedValue as Int
                 launch_progress.progress = progress
+                val pro = (10 * (progress / 100.0F)).toInt()
+                if (pro in 2..9){
+                    showOpenAd.show(
+                        this@MainActivity,
+                        showed = {
+                            stopAnimator()
+                            launch_progress.progress=100
+                        },
+                        closeAd = {
+                            jumpHome()
+                        }
+                    )
+                }else if (pro>=10){
+                    jumpHome()
+                }
             }
-            doOnEnd { jumpHome() }
             start()
         }
     }

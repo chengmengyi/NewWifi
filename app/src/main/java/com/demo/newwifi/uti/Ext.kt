@@ -2,8 +2,10 @@ package com.demo.newwifi.uti
 
 import android.content.Context
 import android.location.LocationManager
+import android.net.ConnectivityManager
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +17,10 @@ import java.util.*
 import kotlin.math.roundToInt
 
 var connectedWifiName=""
+
+fun String.log(){
+    Log.e("qwer",this)
+}
 
 fun Context.showToast(text:String){
     Toast.makeText(this,text, Toast.LENGTH_LONG).show()
@@ -87,4 +93,19 @@ private fun ping(cmd: String): String? {
         process?.destroy()
     }
     return null
+}
+
+fun Context.getNetStatus(): Int {
+    val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val activeNetworkInfo = connectivityManager.activeNetworkInfo
+    if (activeNetworkInfo != null && activeNetworkInfo.isConnected) {
+        if (activeNetworkInfo.type == ConnectivityManager.TYPE_WIFI) {
+            return 2
+        } else if (activeNetworkInfo.type == ConnectivityManager.TYPE_MOBILE) {
+            return 0
+        }
+    } else {
+        return 1
+    }
+    return 1
 }

@@ -1,12 +1,18 @@
 package com.demo.newwifi.ac.network_test
 
 import com.demo.newwifi.R
+import com.demo.newwifi.admob.AdLimitManager
+import com.demo.newwifi.admob.ShowNativeAd
 import com.demo.newwifi.base.BaseAc
+import com.demo.newwifi.conf.LocalConf
 import com.demo.newwifi.uti.TestHistoryManager
 import kotlinx.android.synthetic.main.activity_net_test_result.*
 import java.util.*
 
 class NetTestResultAc:BaseAc(R.layout.activity_net_test_result) {
+    private val showAd by lazy { ShowNativeAd(LocalConf.TEST_RESULT) }
+
+
     override fun initView() {
         immersionBar.statusBarView(top).init()
         iv_back.setOnClickListener { finish() }
@@ -87,5 +93,18 @@ class NetTestResultAc:BaseAc(R.layout.activity_net_test_result) {
             //360P
             else->"360P"
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (AdLimitManager.refresh(LocalConf.TEST_RESULT)){
+            showAd.showAc(this)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        showAd.stopShow()
+        AdLimitManager.setValue(LocalConf.TEST_RESULT,true)
     }
 }

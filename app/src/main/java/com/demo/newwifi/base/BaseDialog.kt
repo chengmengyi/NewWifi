@@ -11,6 +11,9 @@ import com.demo.newwifi.R
 import com.gyf.immersionbar.ImmersionBar
 
 abstract class BaseDialog(private val layout:Int):DialogFragment() {
+    var resume=false
+    lateinit var viewDialog:View
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.BaseDialog)
@@ -27,7 +30,7 @@ abstract class BaseDialog(private val layout:Int):DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        viewDialog=view
         ImmersionBar.with(this).apply {
             statusBarAlpha(0f)
             autoDarkModeEnable(true)
@@ -39,4 +42,19 @@ abstract class BaseDialog(private val layout:Int):DialogFragment() {
 
     abstract fun initView()
 
+
+    override fun onResume() {
+        super.onResume()
+        resume=true
+    }
+
+    override fun onPause() {
+        super.onPause()
+        resume=false
+    }
+
+    override fun onStop() {
+        super.onStop()
+        resume=false
+    }
 }
