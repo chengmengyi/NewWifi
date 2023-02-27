@@ -31,6 +31,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
+                android:singleLine="true"
+                android:ellipsize="end"
                 android:textColor="#525050"
                 android:text="Teamfight Tactics"
                 android:layout_marginLeft="16dp"

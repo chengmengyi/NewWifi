@@ -60,6 +60,11 @@ class HomeAc:BaseAc(R.layout.activity_home), OnRefreshListener {
         checkHasLocationServer()
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        getConnectedWifiInfo()
+        scanWifiList()
+    }
     private fun checkHasLocationServer(){
         if(hasLocationPermission()){
             requestLocationPermission {  }
